@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Create Invoice</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Invoice</h1>
+        <form id="invoiceForm" method="post" action="{% url 'new_invoice' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="Date">Date:</label>
+                <input type="date" class="form-control" id="Date" name="Date" required>
+            </div>
+            <div class="form-group">
+                <label for="Payment_method">Payment Method:</label>
+                <select class="form-control" id="Payment_method" name="Payment_method" required>
+                    <option value="cash">Cash</option>
+                    <option value="credit_card">Credit Card</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="Customer_name">Customer Name:</label>
+                <input type="text" class="form-control" id="Customer_name" name="Customer_name" required>
+            </div>
+
+            {{ formset.management_form }}
+
+            {% for form in formset %}
+                {{ form }}
+                <hr>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary" id="saveButton">Save Invoice</button>
+        </form>
+
+        <button type="button" class="btn btn-secondary" onclick="location.href='{% url 'invoice_list' %}'">Back to Invoice List</button>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        // Handle save button click
+        $("#saveButton").click(function(event) {
+            // Prevent default form submission
+            event.preventDefault();
+
+            // Serialize form data
+            var formData = $("#invoiceForm").serialize();
+
+            // Add CSRF token to the serialized data
+            formData += "&csrfmiddlewaretoken={{ csrf_token }}";
+
+            // Send AJAX request to save data
+            $.ajax({
+                url: "{% url 'new_invoice' %}",
+                type: "post",
+                data: formData,
+                success: function(response) {
+                    // Handle success (you can redirect or perform other actions)
+                    console.log("Invoice saved successfully");
+                },
+                error: function(error) {
+                    // Handle error
+                    console.error("Error saving invoice:", error);
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
